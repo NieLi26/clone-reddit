@@ -1,0 +1,25 @@
+/* ---------------------------------------------
+# Start configuration
+-----------------------------------------------*/
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  max-width: 100%;
+  /* overflow: hidden; */
+}
+
+/* ---------------------------------------------
+# Alpine Prevent render configuration
+-----------------------------------------------*/
+[x-cloak] {
+  display: none !important;
+}
+
+/* ---------------------------------------------
+# Content CKEDITOR
+-----------------------------------------------*/
+.ck-content img {
+  max-height: 500px;
+}

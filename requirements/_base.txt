@@ -1,0 +1,4 @@
+django~=4.1.7
+Pillow==9.4.0 
+django-tailwind==3.5.0 
+django-ckeditor==6.5.1 
