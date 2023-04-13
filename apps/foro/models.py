@@ -3,6 +3,7 @@ import datetime
 from django.utils import timezone
 from django.db import models
 from django.conf import settings
+from django.urls import reverse
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 
@@ -60,10 +61,19 @@ class Subreddit(models.Model):
 
     def __str__(self):
         return self.name
- 
+
     @property
     def get_members_count(self):
         return self.members.count()
+
+    @property
+    def get_image_url(self):
+        if self.image:
+            return self.image.url
+        return f'{settings.STATIC_URL}img/default-thumbnail.jpg'
+
+    def get_absolute_url(self):
+        return reverse('foro:subreddit_detail', kwargs={'name': self.name})
 
 
 class Post(models.Model):
@@ -114,6 +124,14 @@ class Post(models.Model):
         upvotes = self.users_like.count()
         downvotes = self.users_dislike.count()
         return upvotes - downvotes
+
+    def get_absolute_url(self):
+        return reverse('foro:subreddit_post_detail',
+                       kwargs={'subreddit': self.subreddit,
+                               'year': self.created.year,
+                               'month': self.created.month,
+                               'day': self.created.day,
+                               'post': self.slug})
 
 
 class Comment(models.Model):

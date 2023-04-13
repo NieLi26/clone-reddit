@@ -4,34 +4,33 @@
 {% block title %} Home {% endblock title %}
 
 {% block content %}
-  <div class="flex items-center px-6 py-4 md:max-w-3xl md:mx-auto lg:max-w-none lg:mx-0 xl:px-0 space-x-3">
-    <div class="flex-shrink-0">
-      <img
-        class="h-10 w-10 rounded-full"
-        {% if request.user.thumbnail %}
-          src="{{ request.user.thumbnail.url }}"
-        {% else %}
-          src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-        {% endif %}
-        alt=""
-      />
-    </div>
-
-    <div class="w-full">
-      <label for="search" class="sr-only">Search</label>
-      <div class="relative">
-        <input id="search" name="search" class="block w-full bg-white border border-gray-300 rounded-md py-3.5 pl-5 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-rose-500 focus:border-rose-500 sm:text-sm" placeholder="Create Post" type="search">
+  {% if request.user.is_authenticated %}  
+    <div class="flex items-center px-6 py-4 md:max-w-3xl md:mx-auto lg:max-w-none lg:mx-0 xl:px-0 space-x-3">
+      <div class="flex-shrink-0">
+        <img
+          class="h-10 w-10 rounded-full"
+          src="{{ request.user.get_display_thumbnail }}"
+          alt=""
+        />
       </div>
-    </div>
 
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-    </svg>
-    
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-    </svg>
-  </div>
+      <div class="w-full">
+        <label for="search" class="sr-only">Search</label>
+        <a href="{% url 'foro:submit_post' %}" class="relative">
+          <input id="search" name="search" class="block w-full bg-white border border-gray-300 rounded-md py-3.5 pl-5 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-rose-500 focus:border-rose-500 sm:text-sm" placeholder="Create Post" type="search">
+        </a>
+      </div>
+
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+      </svg>
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+      </svg>
+    </div>
+  {% endif %}
+
   <div class="px-4 sm:px-0">
     <div class="sm:hidden">
       <label for="question-tabs" class="sr-only"
@@ -98,8 +97,11 @@
     <h1 class="sr-only">Recent questions</h1>
     <ul role="list" class="space-y-4">
       {% for post in posts %}
-      <li class="bg-white px-4 py-6 shadow sm:p-6 sm:rounded-lg">
+      <li 
+      data-click-redirect="{% url 'foro:subreddit_post_detail' post.subreddit.name post.publish.year post.publish.month post.publish.day post.slug %}"
+      class="bg-white px-4 py-6 shadow sm:p-6 sm:rounded-lg cursor-pointer post">
         <article aria-labelledby="question-title-81614">
+          <!-- Post title/image -->
           <div>
             <div class="flex space-x-3">
               <div class="flex-shrink-0">
@@ -115,7 +117,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-semibold text-gray-900">
-                  <a href="#" class="hover:underline"
+                  <a href="{{ post.subreddit.get_absolute_url }}" class="hover:underline"
                     >{{ post.subreddit }}</a
                   >
                 </p>
@@ -269,17 +271,20 @@
             {{ post.title }}
             </h2>
           </div>
+          <!-- Post body -->
           <div class="mt-2 text-sm text-gray-700 space-y-4 max-h-[500px] overflow-y-hidden">
             <p class="">
               {{ post.body|safe }}
             </p>
           </div>
+          <!-- Post footer -->
           <div class="mt-6 flex justify-between space-x-8">
             <div class="flex space-x-6">
+              {% if request.user.is_authenticated %}
               <span class="inline-flex items-center text-sm">
                 <button
                   type="button"
-                  class="inline-flex space-x-2 text-gray-400 hover:text-gray-500"
+                  class="inline-flex space-x-2 text-gray-400 hover:text-orange-500 button-like {% if request.user in post.users_like.all %} text-orange-500 {% endif %}"
                 >
                   <svg
                     class="h-5 w-5"
@@ -293,10 +298,23 @@
                       d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"
                     ></path>
                   </svg>
-                  <span class="font-medium text-gray-900">29</span>
+                  <span class="font-medium text-gray-900 like" data-slug="{{ post.slug }}" data-action="like" >{{ post.users_like.count }}</span>
                   <span class="sr-only">likes</span>
                 </button>
               </span>
+              <span class="inline-flex items-center text-sm">
+                <button
+                  type="button"
+                  class="inline-flex space-x-2 text-gray-400 hover:text-blue-500 button-dislike {% if request.user in post.users_dislike.all %} text-blue-500 {% endif %}"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                  <path d="M15.73 5.25h1.035A7.465 7.465 0 0118 9.375a7.465 7.465 0 01-1.235 4.125h-.148c-.806 0-1.534.446-2.031 1.08a9.04 9.04 0 01-2.861 2.4c-.723.384-1.35.956-1.653 1.715a4.498 4.498 0 00-.322 1.672V21a.75.75 0 01-.75.75 2.25 2.25 0 01-2.25-2.25c0-1.152.26-2.243.723-3.218C7.74 15.724 7.366 15 6.748 15H3.622c-1.026 0-1.945-.694-2.054-1.715A12.134 12.134 0 011.5 12c0-2.848.992-5.464 2.649-7.521.388-.482.987-.729 1.605-.729H9.77a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23zM21.669 13.773c.536-1.362.831-2.845.831-4.398 0-1.22-.182-2.398-.52-3.507-.26-.85-1.084-1.368-1.973-1.368H19.1c-.445 0-.72.498-.523.898.591 1.2.924 2.55.924 3.977a8.959 8.959 0 01-1.302 4.666c-.245.403.028.959.5.959h1.053c.832 0 1.612-.453 1.918-1.227z" />
+                </svg>
+                  <span class="font-medium text-gray-900 dislike" data-slug="{{ post.slug }}" data-action="dislike">{{ post.users_dislike.count }}</span>
+                  <span class="sr-only">likes</span>
+                </button>
+              </span>
+              {% endif %}
               <span class="inline-flex items-center text-sm">
                 <button
                   type="button"
@@ -316,7 +334,7 @@
                       clip-rule="evenodd"
                     ></path>
                   </svg>
-                  <span class="font-medium text-gray-900">11</span>
+                  <span class="font-medium text-gray-900">{{ post.get_comments_count }}</span>
                   <span class="sr-only">replies</span>
                 </button>
               </span>
@@ -379,565 +397,635 @@
       {% endfor %}
     </ul>
   </div>
-  
 {% endblock content %}
 
 
 {% block right_section %}
-  <section aria-labelledby="who-to-follow-heading">
-    <div class="bg-white rounded-lg shadow">
-      <div class="p-6">
-        <h2
-          id="who-to-follow-heading"
-          class="text-base font-medium text-gray-900"
-        >
-          Who to follow
-        </h2>
-        <div class="mt-6 flow-root">
-          <ul role="list" class="-my-4 divide-y divide-gray-200">
-            <li class="flex items-center py-4 space-x-3">
-              <div class="flex-shrink-0">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-                  alt=""
-                />
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-gray-900">
-                  <a href="#">Leonard Krasner</a>
-                </p>
-                <p class="text-sm text-gray-500">
-                  <a href="#">@leonardkrasner</a>
-                </p>
-              </div>
-              <div class="flex-shrink-0">
-                <button
-                  type="button"
-                  class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
-                >
-                  <svg
-                    class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
-                    x-description="Heroicon name: solid/plus-sm"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span> Follow </span>
-                </button>
-              </div>
-            </li>
-
-            <li class="flex items-center py-4 space-x-3">
-              <div class="flex-shrink-0">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-                  alt=""
-                />
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-gray-900">
-                  <a href="#">Floyd Miles</a>
-                </p>
-                <p class="text-sm text-gray-500">
-                  <a href="#">@floydmiles</a>
-                </p>
-              </div>
-              <div class="flex-shrink-0">
-                <button
-                  type="button"
-                  class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
-                >
-                  <svg
-                    class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
-                    x-description="Heroicon name: solid/plus-sm"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span> Follow </span>
-                </button>
-              </div>
-            </li>
-
-            <li class="flex items-center py-4 space-x-3">
-              <div class="flex-shrink-0">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-                  alt=""
-                />
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-gray-900">
-                  <a href="#">Emily Selman</a>
-                </p>
-                <p class="text-sm text-gray-500">
-                  <a href="#">@emilyselman</a>
-                </p>
-              </div>
-              <div class="flex-shrink-0">
-                <button
-                  type="button"
-                  class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
-                >
-                  <svg
-                    class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
-                    x-description="Heroicon name: solid/plus-sm"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span> Follow </span>
-                </button>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="mt-6">
-          <a
-            href="#"
-            class="w-full block text-center px-4 py-2 border border-sky-300 shadow-sm text-sm font-bold rounded-md text-white bg-sky-700 hover:bg-sky-600"
+  {% if request.user.is_authenticated %}
+    <section aria-labelledby="who-to-follow-heading">
+      <div class="bg-white rounded-lg shadow">
+        <div class="p-6">
+          <!-- <h2
+            id="who-to-follow-heading"
+            class="text-base font-medium text-gray-900"
           >
-            Create Post
-          </a>
-        </div>
+            Who to follow
+          </h2>
+          <div class="mt-6 flow-root">
+            <ul role="list" class="-my-4 divide-y divide-gray-200">
+              <li class="flex items-center py-4 space-x-3">
+                <div class="flex-shrink-0">
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+                    alt=""
+                  />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900">
+                    <a href="#">Leonard Krasner</a>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    <a href="#">@leonardkrasner</a>
+                  </p>
+                </div>
+                <div class="flex-shrink-0">
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
+                  >
+                    <svg
+                      class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
+                      x-description="Heroicon name: solid/plus-sm"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                    <span> Follow </span>
+                  </button>
+                </div>
+              </li>
 
-        <div x-data="{ isOpen: false }" class="relative flex justify-center mt-3">
-          <button @click="isOpen = true" class="w-full block text-center px-4 py-2 border border-sky-300 shadow-sm text-sm font-bold rounded-md text-sky-700 bg-white hover:bg-sky-50">
-            Create Community
-          </button>
-      
-          <div x-show="isOpen" 
-              x-cloak
-              x-transition:enter="transition duration-300 ease-out"
-              x-transition:enter-start="translate-y-4 opacity-0 sm:translate-y-0 sm:scale-95"
-              x-transition:enter-end="translate-y-0 opacity-100 sm:scale-100"
-              x-transition:leave="transition duration-150 ease-in"
-              x-transition:leave-start="translate-y-0 opacity-100 sm:scale-100"
-              x-transition:leave-end="translate-y-4 opacity-0 sm:translate-y-0 sm:scale-95"
-              class="fixed inset-0 z-10 overflow-y-auto" 
-              aria-labelledby="modal-title" role="dialog" aria-modal="true"
-          >
-              <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-                  <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
-      
-                      <div @click.away="isOpen = false" class="relative inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl dark:bg-gray-900 sm:my-8 sm:w-full sm:max-w-sm sm:p-6 sm:align-middle">
-                          <h3 class="text-lg font-medium leading-6 text-gray-800 capitalize dark:text-white" id="modal-title">
-                              Create a community
-                          </h3>
-                          <div class="border-solid border-0 border-gray-300 my-3"></div>
-                          <p class="text-sm text-gray-500 dark:text-gray-400">
-                              Your new project has been created. Invite your
-                              team to collaborate on this project.
-                          </p>
-      
-                          <form class="mt-4" action="{% url 'foro:subreddit_create' %}" method="post">
-                            {% csrf_token %}
-                              <label for="name-list" class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                  Name
-                              </label>
+              <li class="flex items-center py-4 space-x-3">
+                <div class="flex-shrink-0">
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+                    alt=""
+                  />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900">
+                    <a href="#">Floyd Miles</a>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    <a href="#">@floydmiles</a>
+                  </p>
+                </div>
+                <div class="flex-shrink-0">
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
+                  >
+                    <svg
+                      class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
+                      x-description="Heroicon name: solid/plus-sm"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                    <span> Follow </span>
+                  </button>
+                </div>
+              </li>
 
-                              <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                              Community names including capitalization cannot be changed.
-                              </p>
-      
-                              <label class="block mt-3" for="name">
-                                  {{ form.name }}
-                                  <!-- <input type="text" name="name" id="id_name" placeholder="r/" class="block w-full px-4 py-3 text-sm text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-blue-300" /> -->
-                              </label>
-      
-                              <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                21 Characters remaining
-                              </p>
+              <li class="flex items-center py-4 space-x-3">
+                <div class="flex-shrink-0">
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+                    alt=""
+                  />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900">
+                    <a href="#">Emily Selman</a>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    <a href="#">@emilyselman</a>
+                  </p>
+                </div>
+                <div class="flex-shrink-0">
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
+                  >
+                    <svg
+                      class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
+                      x-description="Heroicon name: solid/plus-sm"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                    <span> Follow </span>
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </div> -->
+          <div class="mt-6">
+            <a
+              href="#"
+              class="w-full block text-center px-4 py-2 border border-sky-300 shadow-sm text-sm font-bold rounded-md text-white bg-sky-700 hover:bg-sky-600"
+            >
+              Create Post
+            </a>
+          </div>
 
-                              
-                            <fieldset>
-                              <div class="mt-6 space-y-6">
-                                <div class="flex items-center gap-x-3">
-                                  <input id="push-everything" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600">
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-400">
-                                    <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
-                                  </svg>
+          <div x-data="{ isOpen: false }" class="relative flex justify-center mt-3">
+            <button @click="isOpen = true" class="w-full block text-center px-4 py-2 border border-sky-300 shadow-sm text-sm font-bold rounded-md text-sky-700 bg-white hover:bg-sky-50">
+              Create Community
+            </button>
+        
+            <div x-show="isOpen" 
+                x-cloak
+                x-transition:enter="transition duration-300 ease-out"
+                x-transition:enter-start="translate-y-4 opacity-0 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="translate-y-0 opacity-100 sm:scale-100"
+                x-transition:leave="transition duration-150 ease-in"
+                x-transition:leave-start="translate-y-0 opacity-100 sm:scale-100"
+                x-transition:leave-end="translate-y-4 opacity-0 sm:translate-y-0 sm:scale-95"
+                class="fixed inset-0 z-10 overflow-y-auto" 
+                aria-labelledby="modal-title" role="dialog" aria-modal="true"
+            >
+                <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                  <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                    <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
+        
+                        <div @click.away="isOpen = false" class="relative inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl dark:bg-gray-900 sm:my-8 sm:w-full sm:max-w-sm sm:p-6 sm:align-middle">
+                            <h3 class="text-lg font-medium leading-6 text-gray-800 capitalize dark:text-white" id="modal-title">
+                                Create a community
+                            </h3>
+                            <div class="border-solid border-0 border-gray-300 my-3"></div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                Your new project has been created. Invite your
+                                team to collaborate on this project.
+                            </p>
+        
+                            <form class="mt-4" action="{% url 'foro:subreddit_create' %}" method="post">
+                              {% csrf_token %}
+                                <label for="name-list" class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                    Name
+                                </label>
+
+                                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                Community names including capitalization cannot be changed.
+                                </p>
+        
+                                <label class="block mt-3" for="name">
+                                    {{ form.name }}
+                                    <!-- <input type="text" name="name" id="id_name" placeholder="r/" class="block w-full px-4 py-3 text-sm text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-blue-300" /> -->
+                                </label>
+        
+                                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                  21 Characters remaining
+                                </p>
+
                                 
-                                  <label for="push-everything" class="block text-sm font-semibold leading-6 text-gray-900">
-                                    Public
-                                    <span class="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
-                                      Anyone can view, post, and comment to this community
-                                    </span>
-                                  </label>
-                                
-                                </div>
-                                <div class="flex items-center gap-x-3">
-                                  <input id="push-email" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600">
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-400">
-                                    <path fill-rule="evenodd" d="M3.28 2.22a.75.75 0 00-1.06 1.06l14.5 14.5a.75.75 0 101.06-1.06l-1.745-1.745a10.029 10.029 0 003.3-4.38 1.651 1.651 0 000-1.185A10.004 10.004 0 009.999 3a9.956 9.956 0 00-4.744 1.194L3.28 2.22zM7.752 6.69l1.092 1.092a2.5 2.5 0 013.374 3.373l1.091 1.092a4 4 0 00-5.557-5.557z" clip-rule="evenodd" />
-                                    <path d="M10.748 13.93l2.523 2.523a9.987 9.987 0 01-3.27.547c-4.258 0-7.894-2.66-9.337-6.41a1.651 1.651 0 010-1.186A10.007 10.007 0 012.839 6.02L6.07 9.252a4 4 0 004.678 4.678z" />
-                                  </svg>
-
-                                  <label for="push-everything" class="block text-sm font-semibold leading-6 text-gray-900">
-                                    Restricted
-                                    <span class="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
-                                      Anyone can view this community, but only approved users can post
-                                    </span>
-                                  </label>
-                                </div>
-                                <div class="flex items-center gap-x-3">
-                                  <input id="push-nothing" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600">
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-400">
-                                    <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
-                                  </svg>
+                              <fieldset>
+                                <div class="mt-6 space-y-6">
+                                  <div class="flex items-center gap-x-3">
+                                    <input id="push-everything" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-400">
+                                      <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
+                                    </svg>
                                   
-                                  <label for="push-everything" class="block text-sm font-semibold leading-6 text-gray-900">
-                                    Private
-                                    <span class="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
-                                      Only approved users can view and submit to this community
-                                    </span>
-                                  </label>
-                                </div>
-                              </div>
-                            </fieldset>
+                                    <label for="push-everything" class="block text-sm font-semibold leading-6 text-gray-900">
+                                      Public
+                                      <span class="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                                        Anyone can view, post, and comment to this community
+                                      </span>
+                                    </label>
+                                  
+                                  </div>
+                                  <div class="flex items-center gap-x-3">
+                                    <input id="push-email" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-400">
+                                      <path fill-rule="evenodd" d="M3.28 2.22a.75.75 0 00-1.06 1.06l14.5 14.5a.75.75 0 101.06-1.06l-1.745-1.745a10.029 10.029 0 003.3-4.38 1.651 1.651 0 000-1.185A10.004 10.004 0 009.999 3a9.956 9.956 0 00-4.744 1.194L3.28 2.22zM7.752 6.69l1.092 1.092a2.5 2.5 0 013.374 3.373l1.091 1.092a4 4 0 00-5.557-5.557z" clip-rule="evenodd" />
+                                      <path d="M10.748 13.93l2.523 2.523a9.987 9.987 0 01-3.27.547c-4.258 0-7.894-2.66-9.337-6.41a1.651 1.651 0 010-1.186A10.007 10.007 0 012.839 6.02L6.07 9.252a4 4 0 004.678 4.678z" />
+                                    </svg>
 
-                              <button type="button" class="mt-2 flex items-center rounded py-1.5 px-2 text-sm text-blue-600 transition-colors duration-300 hover:text-blue-400 focus:outline-none dark:text-blue-400 dark:hover:text-blue-500">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                  </svg>
-      
-                                  <span class="mx-2">Add another</span>
-                              </button>
-      
-      
-                              <div class="mt-4 sm:flex sm:items-center sm:-mx-2">
-                                  <button type="button" @click="isOpen = false" class="w-full px-4 py-2 text-sm font-medium tracking-wide text-gray-700 capitalize transition-colors duration-300 transform border border-gray-200 rounded-md sm:w-1/2 sm:mx-2 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 hover:bg-gray-100 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-40">
-                                      Cancel
-                                  </button>
-      
-                                  <button type="submit" class="w-full px-4 py-2 mt-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-md sm:mt-0 sm:w-1/2 sm:mx-2 hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40">
-                                      Enviar
-                                  </button>
-                              </div>
-                          </form>
-                      </div>
-              </div>
+                                    <label for="push-everything" class="block text-sm font-semibold leading-6 text-gray-900">
+                                      Restricted
+                                      <span class="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                                        Anyone can view this community, but only approved users can post
+                                      </span>
+                                    </label>
+                                  </div>
+                                  <div class="flex items-center gap-x-3">
+                                    <input id="push-nothing" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-400">
+                                      <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
+                                    </svg>
+                                    
+                                    <label for="push-everything" class="block text-sm font-semibold leading-6 text-gray-900">
+                                      Private
+                                      <span class="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                                        Only approved users can view and submit to this community
+                                      </span>
+                                    </label>
+                                  </div>
+                                </div>
+                              </fieldset>
+
+                                <button type="button" class="mt-2 flex items-center rounded py-1.5 px-2 text-sm text-blue-600 transition-colors duration-300 hover:text-blue-400 focus:outline-none dark:text-blue-400 dark:hover:text-blue-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+        
+                                    <span class="mx-2">Add another</span>
+                                </button>
+        
+        
+                                <div class="mt-4 sm:flex sm:items-center sm:-mx-2">
+                                    <button type="button" @click="isOpen = false" class="w-full px-4 py-2 text-sm font-medium tracking-wide text-gray-700 capitalize transition-colors duration-300 transform border border-gray-200 rounded-md sm:w-1/2 sm:mx-2 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 hover:bg-gray-100 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-40">
+                                        Cancel
+                                    </button>
+        
+                                    <button type="submit" class="w-full px-4 py-2 mt-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-md sm:mt-0 sm:w-1/2 sm:mx-2 hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40">
+                                        Enviar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+    <!-- <section aria-labelledby="who-to-follow-heading">
+      <div class="bg-white rounded-lg shadow">
+        <div class="p-6">
+          <h2
+            id="who-to-follow-heading"
+            class="text-base font-medium text-gray-900"
+          >
+            Who to follow
+          </h2>
+          <div class="mt-6 flow-root">
+            <ul role="list" class="-my-4 divide-y divide-gray-200">
+              <li class="flex items-center py-4 space-x-3">
+                <div class="flex-shrink-0">
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+                    alt=""
+                  />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900">
+                    <a href="#">Leonard Krasner</a>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    <a href="#">@leonardkrasner</a>
+                  </p>
+                </div>
+                <div class="flex-shrink-0">
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
+                  >
+                    <svg
+                      class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
+                      x-description="Heroicon name: solid/plus-sm"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                    <span> Follow </span>
+                  </button>
+                </div>
+              </li>
+
+              <li class="flex items-center py-4 space-x-3">
+                <div class="flex-shrink-0">
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+                    alt=""
+                  />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900">
+                    <a href="#">Floyd Miles</a>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    <a href="#">@floydmiles</a>
+                  </p>
+                </div>
+                <div class="flex-shrink-0">
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
+                  >
+                    <svg
+                      class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
+                      x-description="Heroicon name: solid/plus-sm"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                    <span> Follow </span>
+                  </button>
+                </div>
+              </li>
+
+              <li class="flex items-center py-4 space-x-3">
+                <div class="flex-shrink-0">
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+                    alt=""
+                  />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium text-gray-900">
+                    <a href="#">Emily Selman</a>
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    <a href="#">@emilyselman</a>
+                  </p>
+                </div>
+                <div class="flex-shrink-0">
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
+                  >
+                    <svg
+                      class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
+                      x-description="Heroicon name: solid/plus-sm"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                    <span> Follow </span>
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="mt-6">
+            <a
+              href="#"
+              class="w-full block text-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              View all
+            </a>
           </div>
         </div>
-
       </div>
-    </div>
-  </section>
-  <section aria-labelledby="who-to-follow-heading">
-    <div class="bg-white rounded-lg shadow">
-      <div class="p-6">
-        <h2
-          id="who-to-follow-heading"
-          class="text-base font-medium text-gray-900"
-        >
-          Who to follow
-        </h2>
-        <div class="mt-6 flow-root">
-          <ul role="list" class="-my-4 divide-y divide-gray-200">
-            <li class="flex items-center py-4 space-x-3">
-              <div class="flex-shrink-0">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-                  alt=""
-                />
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-gray-900">
-                  <a href="#">Leonard Krasner</a>
-                </p>
-                <p class="text-sm text-gray-500">
-                  <a href="#">@leonardkrasner</a>
-                </p>
-              </div>
-              <div class="flex-shrink-0">
-                <button
-                  type="button"
-                  class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
-                >
-                  <svg
-                    class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
-                    x-description="Heroicon name: solid/plus-sm"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span> Follow </span>
-                </button>
-              </div>
-            </li>
-
-            <li class="flex items-center py-4 space-x-3">
-              <div class="flex-shrink-0">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-                  alt=""
-                />
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-gray-900">
-                  <a href="#">Floyd Miles</a>
-                </p>
-                <p class="text-sm text-gray-500">
-                  <a href="#">@floydmiles</a>
-                </p>
-              </div>
-              <div class="flex-shrink-0">
-                <button
-                  type="button"
-                  class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
-                >
-                  <svg
-                    class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
-                    x-description="Heroicon name: solid/plus-sm"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span> Follow </span>
-                </button>
-              </div>
-            </li>
-
-            <li class="flex items-center py-4 space-x-3">
-              <div class="flex-shrink-0">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-                  alt=""
-                />
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-gray-900">
-                  <a href="#">Emily Selman</a>
-                </p>
-                <p class="text-sm text-gray-500">
-                  <a href="#">@emilyselman</a>
-                </p>
-              </div>
-              <div class="flex-shrink-0">
-                <button
-                  type="button"
-                  class="inline-flex items-center px-3 py-0.5 rounded-full bg-rose-50 text-sm font-medium text-rose-700 hover:bg-rose-100"
-                >
-                  <svg
-                    class="-ml-1 mr-0.5 h-5 w-5 text-rose-400"
-                    x-description="Heroicon name: solid/plus-sm"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  <span> Follow </span>
-                </button>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="mt-6">
-          <a
-            href="#"
-            class="w-full block text-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+    </section> -->
+    <!-- <section aria-labelledby="trending-heading">
+      <div class="bg-white rounded-lg shadow">
+        <div class="p-6">
+          <h2
+            id="trending-heading"
+            class="text-base font-medium text-gray-900"
           >
-            View all
-          </a>
+            Trending
+          </h2>
+          <div class="mt-6 flow-root">
+            <ul role="list" class="-my-4 divide-y divide-gray-200">
+              <li class="flex py-4 space-x-3">
+                <div class="flex-shrink-0">
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+                    alt="Floyd Miles"
+                  />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-gray-800">
+                    What books do you have on your bookshelf just to
+                    look smarter than you actually are?
+                  </p>
+                  <div class="mt-2 flex">
+                    <span class="inline-flex items-center text-sm">
+                      <button
+                        type="button"
+                        class="inline-flex space-x-2 text-gray-400 hover:text-gray-500"
+                      >
+                        <svg
+                          class="h-5 w-5"
+                          x-description="Heroicon name: solid/chat-alt"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
+                            clip-rule="evenodd"
+                          ></path>
+                        </svg>
+                        <span class="font-medium text-gray-900"
+                          >291</span
+                        >
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </li>
+
+              <li class="flex py-4 space-x-3">
+                <div class="flex-shrink-0">
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+                    alt="Emily Selman"
+                  />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-gray-800">
+                    Have you ever lied about your age to buy a kid's
+                    meal at a restaurant?
+                  </p>
+                  <div class="mt-2 flex">
+                    <span class="inline-flex items-center text-sm">
+                      <button
+                        type="button"
+                        class="inline-flex space-x-2 text-gray-400 hover:text-gray-500"
+                      >
+                        <svg
+                          class="h-5 w-5"
+                          x-description="Heroicon name: solid/chat-alt"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
+                            clip-rule="evenodd"
+                          ></path>
+                        </svg>
+                        <span class="font-medium text-gray-900"
+                          >164</span
+                        >
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </li>
+
+              <li class="flex py-4 space-x-3">
+                <div class="flex-shrink-0">
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+                    alt="Kristin Watson"
+                  />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm text-gray-800">
+                    Does Santa Claus pay property taxes for his
+                    workshop at the North Pole?
+                  </p>
+                  <div class="mt-2 flex">
+                    <span class="inline-flex items-center text-sm">
+                      <button
+                        type="button"
+                        class="inline-flex space-x-2 text-gray-400 hover:text-gray-500"
+                      >
+                        <svg
+                          class="h-5 w-5"
+                          x-description="Heroicon name: solid/chat-alt"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
+                            clip-rule="evenodd"
+                          ></path>
+                        </svg>
+                        <span class="font-medium text-gray-900"
+                          >133</span
+                        >
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="mt-6">
+            <a
+              href="#"
+              class="w-full block text-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              View all
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-  <section aria-labelledby="trending-heading">
-    <div class="bg-white rounded-lg shadow">
-      <div class="p-6">
-        <h2
-          id="trending-heading"
-          class="text-base font-medium text-gray-900"
-        >
-          Trending
-        </h2>
-        <div class="mt-6 flow-root">
-          <ul role="list" class="-my-4 divide-y divide-gray-200">
-            <li class="flex py-4 space-x-3">
-              <div class="flex-shrink-0">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-                  alt="Floyd Miles"
-                />
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm text-gray-800">
-                  What books do you have on your bookshelf just to
-                  look smarter than you actually are?
-                </p>
-                <div class="mt-2 flex">
-                  <span class="inline-flex items-center text-sm">
-                    <button
-                      type="button"
-                      class="inline-flex space-x-2 text-gray-400 hover:text-gray-500"
-                    >
-                      <svg
-                        class="h-5 w-5"
-                        x-description="Heroicon name: solid/chat-alt"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
-                          clip-rule="evenodd"
-                        ></path>
-                      </svg>
-                      <span class="font-medium text-gray-900"
-                        >291</span
-                      >
-                    </button>
-                  </span>
-                </div>
-              </div>
-            </li>
-
-            <li class="flex py-4 space-x-3">
-              <div class="flex-shrink-0">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-                  alt="Emily Selman"
-                />
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm text-gray-800">
-                  Have you ever lied about your age to buy a kid's
-                  meal at a restaurant?
-                </p>
-                <div class="mt-2 flex">
-                  <span class="inline-flex items-center text-sm">
-                    <button
-                      type="button"
-                      class="inline-flex space-x-2 text-gray-400 hover:text-gray-500"
-                    >
-                      <svg
-                        class="h-5 w-5"
-                        x-description="Heroicon name: solid/chat-alt"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
-                          clip-rule="evenodd"
-                        ></path>
-                      </svg>
-                      <span class="font-medium text-gray-900"
-                        >164</span
-                      >
-                    </button>
-                  </span>
-                </div>
-              </div>
-            </li>
-
-            <li class="flex py-4 space-x-3">
-              <div class="flex-shrink-0">
-                <img
-                  class="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-                  alt="Kristin Watson"
-                />
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm text-gray-800">
-                  Does Santa Claus pay property taxes for his
-                  workshop at the North Pole?
-                </p>
-                <div class="mt-2 flex">
-                  <span class="inline-flex items-center text-sm">
-                    <button
-                      type="button"
-                      class="inline-flex space-x-2 text-gray-400 hover:text-gray-500"
-                    >
-                      <svg
-                        class="h-5 w-5"
-                        x-description="Heroicon name: solid/chat-alt"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
-                          clip-rule="evenodd"
-                        ></path>
-                      </svg>
-                      <span class="font-medium text-gray-900"
-                        >133</span
-                      >
-                    </button>
-                  </span>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="mt-6">
-          <a
-            href="#"
-            class="w-full block text-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            View all
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section> -->
+  {% endif %}
 {% endblock right_section %}
+
+{% block domready %}
+
+  function likeStatus(buttonLike, buttonDislike, data){
+    buttonDislike.querySelector('.dislike').innerHTML = data['dislikes']
+    buttonLike.querySelector('.like').innerHTML = data['likes']
+    
+    const like_exists = data['like_exists']
+    const dislike_exists = data['dislike_exists']
+
+    like_exists ? buttonLike.classList.replace("text-gray-400", "text-orange-500") : buttonLike.classList.replace("text-orange-500", "text-gray-400")
+    dislike_exists ? buttonDislike.classList.replace("text-gray-400", "text-blue-500") : buttonDislike.classList.replace("text-blue-500", "text-gray-400")
+ }
+
+ function sendLikeRequest(currentButton, buttonLike, buttonDislike){
+    const url = '{% url "foro:post_like" %}';
+    const options = {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrftoken},
+        mode: 'same-origin'
+    }
+
+    // add request body
+    var formData = new FormData();
+    formData.append('slug', currentButton.dataset.slug);
+    formData.append('action', currentButton.dataset.action);
+    options['body'] = formData;
+
+    // send
+    fetch(url, options)
+    .then(res=>res.json())
+    .then(data=>{
+      if (data['status'] === 'ok'){
+        likeStatus(buttonLike, buttonDislike, data)
+      }
+      console.log(data);
+    })
+ }
+
+  document.querySelectorAll('li.post')
+          .forEach((post)=>{
+
+            post.addEventListener('click', function(){
+              const currentPost = this;
+              location.href = currentPost.dataset.clickRedirect
+            });
+            
+            const buttonLike = post.querySelector('.button-like')
+            const buttonDislike = post.querySelector('.button-dislike')
+
+            buttonLike.addEventListener('click', function(){
+              event.stopPropagation();
+              let currentButton = this;
+              currentButton = currentButton.querySelector('.like')
+
+              sendLikeRequest(currentButton, buttonLike, buttonDislike)
+            });
+
+            buttonDislike.addEventListener('click', function(){
+              event.stopPropagation();
+              let currentButton = this;
+              currentButton = currentButton.querySelector('.dislike')
+
+              sendLikeRequest(currentButton, buttonLike, buttonDislike)
+            });
+
+          })
+
+{% endblock domready %}

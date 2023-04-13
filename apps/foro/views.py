@@ -5,6 +5,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Value
+from django.db.models.functions import Coalesce
+from django.conf import settings
 
 
 from .models import Post, Subreddit, Comment
@@ -38,6 +41,7 @@ class CommentCreateListView(View):
         try:
             post_slug = request.POST.get('slug')
             comment_parent = request.POST.get('parent')
+            print(comment_parent)
             # print(int(comment_parent))
             post = Post.objects.get(slug=post_slug)
             action = request.POST.get('action')
@@ -48,8 +52,9 @@ class CommentCreateListView(View):
                     comment = form.save(commit=False)
                     comment.author = request.user
                     comment.post = post
-                    comment_instance = Comment.objects.get(id=comment_parent)
-                    comment.parent = comment_instance
+                    if comment_parent:
+                        comment.parent = Comment.objects \
+                                                .get(id=comment_parent)
                     comment.save()
                     response['status'] = 'ok'
                 else:
@@ -82,17 +87,23 @@ class PostCreateView(View):
     def get(self, request, subreddit):
         subreddit = get_object_or_404(Subreddit,
                                       name=subreddit)
+        subreddits = Subreddit.objects.all()
+
         form = PostForm(user=request.user,
                         subreddit=subreddit)
+        disabled = None
         context = {
             'form': form,
-            'subreddit': subreddit
+            'subreddit': subreddit,
+            'subreddits': subreddits,
+            'disabled': disabled,
         }
         return render(request, 'foro/post/create.html', context)
 
     def post(self, request, subreddit):
         subreddit = get_object_or_404(Subreddit,
                                       name=subreddit)
+        subreddits = Subreddit.objects.all()
         form = PostForm(request.POST,
                         user=request.user,
                         subreddit=subreddit)
@@ -100,12 +111,27 @@ class PostCreateView(View):
             post = form.save()
             return redirect(reverse('foro:subreddit_detail',
                                     args=[post.subreddit.name]))
+        disabled = None
         context = {
             'form': form,
-            'subreddit': subreddit
+            'subreddit': subreddit,
+            'subreddits': subreddits,
+            'disabled': disabled,
         }
         return render(request, 'foro/post/create.html', context)
 
+
+class PostSubmit(View):
+    def get(self, request):
+        form = PostForm()
+        subreddits = Subreddit.objects.all()
+        disabled = True
+        context = {
+            'form': form,
+            'subreddits': subreddits,
+            'disabled': disabled
+        }
+        return render(request, 'foro/post/create.html', context)
 
 class PostLike(View):
     def post(self, request, *args, **kwargs):
@@ -182,11 +208,10 @@ class SubredditCreateView(LoginRequiredMixin, View):
         return redirect('pages:home')
 
 
-class SubredditDetailView(LoginRequiredMixin, View):
+class SubredditDetailView(View):
     def get(self, request, name):
         subreddit = Subreddit.objects.get(name=name)
         context = {
             'subreddit': subreddit,
         }
         return render(request, 'foro/subreddit/detail.html', context)
-

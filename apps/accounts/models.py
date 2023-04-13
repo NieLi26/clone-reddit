@@ -56,6 +56,6 @@ class CustomUser(AbstractUser):
     @property
     def get_display_thumbnail(self):
         if self.thumbnail:
-            return f'{settings.MEDIA_URL}{self.thumbnail}'
+            return self.thumbnail.url
         return f'{settings.STATIC_URL}img/default-thumbnail.jpg'
     

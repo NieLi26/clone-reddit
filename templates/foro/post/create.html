@@ -4,96 +4,45 @@
 {% block title %} {{ subreddit.name }} {% endblock title %}
 
 {% block content %}
-<div class="flex items-center px-6 py-4 md:max-w-3xl md:mx-auto lg:max-w-none lg:mx-0 xl:px-0 space-x-3">
-  <div class="flex-shrink-0">
-    <img
-      class="h-10 w-10 rounded-full"
-      {% if request.user.thumbnail %}
-        src="{{ request.user.thumbnail.url }}"
-      {% else %}
-        src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-      {% endif %}
-      alt=""
-    />
+<div 
+x-data = "{open: false}"
+class="relative inline-block text-left">
+  <div>
+    <button 
+    @click = "open = true"
+    type="button" class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" id="menu-button" aria-expanded="true" aria-haspopup="true">
+      Select Community
+      <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+      </svg>
+    </button>
   </div>
 
-  <div class="w-full">
-    <label for="search" class="sr-only">Search</label>
-    <div class="relative">
-      <input id="search" name="search" class="block w-full bg-white border border-gray-300 rounded-md py-3.5 pl-5 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-rose-500 focus:border-rose-500 sm:text-sm" placeholder="Create Post" type="search">
+  <div 
+  x-show="open"
+  @click.away = "open = false"
+  class="absolute right-0 z-40 mt-2 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+    <div class="py-1 overflow-y-auto h-96" role="none">
+      <span class="text-sm text-gray-400 px-4">your profile</span>
+      <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
+      {% for sub in subreddits  %}
+        <a href="{% url 'foro:subreddit_post_create' sub %}" class="flex items-center text-gray-700 px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0">
+          <div class="flex-shrink-0">
+            <img
+              class="h-10 w-10 rounded-full"
+              src="{{ sub.get_image_url }}"
+              alt=""
+            />
+          </div>
+          <div class="ml-2">
+            r/{{ sub.name }}
+          </div>
+        </a>
+      {% endfor %}
     </div>
   </div>
-
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-  </svg>
-  
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-  </svg>
 </div>
-  <div class="px-4 sm:px-0">
-    <div class="sm:hidden">
-      <label for="question-tabs" class="sr-only"
-        >Select a tab</label
-      >
-      <select
-        id="question-tabs"
-        class="block w-full rounded-md border-gray-300 text-base font-medium text-gray-900 shadow-sm focus:border-rose-500 focus:ring-rose-500"
-      >
-        <option selected="">Recent</option>
 
-        <option>Most Liked</option>
-
-        <option>Most Answers</option>
-      </select>
-    </div>
-    <div class="hidden sm:block">
-      <nav
-        class="relative z-0 rounded-lg shadow flex divide-x divide-gray-200"
-        aria-label="Tabs"
-      >
-        <a
-          href="#"
-          aria-current="page"
-          class="text-gray-900 rounded-l-lg group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10"
-          x-state:on="Current"
-          x-state:off="Default"
-          x-state-description='Current: "text-gray-900", Default: "text-gray-500 hover:text-gray-700"'
-        >
-          <span>Recent</span>
-          <span
-            aria-hidden="true"
-            class="bg-rose-500 absolute inset-x-0 bottom-0 h-0.5"
-          ></span>
-        </a>
-
-        <a
-          href="#"
-          class="text-gray-500 hover:text-gray-700 group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10"
-          x-state-description='undefined: "text-gray-900", undefined: "text-gray-500 hover:text-gray-700"'
-        >
-          <span>Most Liked</span>
-          <span
-            aria-hidden="true"
-            class="bg-transparent absolute inset-x-0 bottom-0 h-0.5"
-          ></span>
-        </a>
-
-        <a
-          href="#"
-          class="text-gray-500 hover:text-gray-700 rounded-r-lg group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10"
-          x-state-description='undefined: "text-gray-900", undefined: "text-gray-500 hover:text-gray-700"'
-        >
-          <span>Most Answers</span>
-          <span
-            aria-hidden="true"
-            class="bg-transparent absolute inset-x-0 bottom-0 h-0.5"
-          ></span>
-        </a>
-      </nav>
-    </div>
-  </div>
   <div class="mt-4">
     <h1 class="sr-only">Recent questions</h1>
     <form action="." method="post">
@@ -107,10 +56,10 @@
 
             <div class="w-full px-4 pb-4 ml-auto text-gray-500 ">
                 <div class="flex items-center justify-end space-x-2">
-                    <button type="button" class="py-2 px-4  boder border-blue-700 bg-white hover:bg-gray-50 focus:ring-blue-500 focus:ring-offset-blue-200 text-blue-700 w-md transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-full ">
+                    <!-- <button type="button" class="py-2 px-4  boder border-blue-700 bg-white hover:bg-gray-50 focus:ring-blue-500 focus:ring-offset-blue-200 text-blue-700 w-md transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-full ">
                         Save draft
-                    </button>
-                    <button type="submit" class="py-2 px-4  bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-md transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-full ">
+                    </button> -->
+                    <button type="submit" {% if disabled %} disabled {% endif %} class="py-2 px-4 {% if disabled %} bg-gray-800 hover:bg-gray-800 focus:ring-gray-600 {% else %} bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 {% endif %}  focus:ring-offset-blue-200 text-white w-md transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-full ">
                         Post
                     </button>
                 </div>
@@ -118,11 +67,11 @@
         </div>
     </form>
   </div>
-  
 {% endblock content %}
 
 
 {% block right_section %}
+{% if not disabled %}
   <section aria-labelledby="who-to-follow-heading">
     <div class="bg-white rounded-lg shadow">
         <div class="flex items-center justify-between rounded-t-lg py-4 px-3 w-full bg-sky-700">
@@ -264,7 +213,6 @@
           </div>
             </div>
         </div>
-        
       <div class="p-6 ">
         <div class="flex items-center space-x-3">
             <div class="flex-shrink-0">
@@ -301,8 +249,7 @@
             {{ subreddit.description|safe }} 
             </p>
         </div>
-
-        <div class="flex items-center py-4 space-x-3">
+        <!-- <div class="flex items-center py-4 space-x-3">
             <div class="flex-shrink-0">
               <img
                 class="h-8 w-8 rounded-full"
@@ -340,8 +287,9 @@
                 <span> Follow </span>
               </button>
             </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </section>
+  {% endif %}
 {% endblock right_section %}

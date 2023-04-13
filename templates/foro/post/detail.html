@@ -53,7 +53,7 @@
 
   </div>
 
-  <section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
+  <!-- <section class="bg-white dark:bg-gray-900 py-8 lg:py-16">
     <div class="max-w-2xl mx-auto px-4">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Discussion (20)</h2>
@@ -92,7 +92,7 @@
                   </svg>
                   <span class="sr-only">Comment settings</span>
               </button>
-              <!-- Dropdown menu -->
+     
               <div id="dropdownComment1"
                   class="hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
                   <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
@@ -144,7 +144,7 @@
                   </svg>
                   <span class="sr-only">Comment settings</span>
               </button>
-              <!-- Dropdown menu -->
+    
               <div id="dropdownComment2"
                   class="hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
                   <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
@@ -175,7 +175,7 @@
       </article>
 
     </div>
-  </section>
+  </section> -->
 
   <!-- Genera una etiqueta script con un id ('json-body') y dentro de la etiqueta se le pasa el contexto ('request.user.username')-->
   {{ request.user.username |json_script:"json-username" }}
@@ -331,20 +331,16 @@
             <div class="flex-shrink-0">
               <img
                 class="h-14 w-14 rounded-full"
-                {% if post.subreddit.image %}
-                  src="{{ post.subreddit.image.url  }}"
-                {% else %}
-                  src="{% static 'img/default-thumbnail.jpg' %}"
-                {% endif %}
+                  src="{{ post.subreddit.get_image_url  }}"
                 alt=""
               />
             </div>
             <div class="min-w-0 flex-1">
               <p class="text-sm font-semibold text-gray-900">
-                <a href="#" class="hover:underline">
+                <a href="{{ post.subreddit.get_absolute_url }}" class="hover:underline">
                   <time datetime="2020-12-09T11:43:00">
                     <!-- December 9 at 11:43 AM -->
-                   r/{{ subreddit.name }} 
+                   r/{{ post.subreddit.name }} 
                   </time
                   >
                 </a>
@@ -363,7 +359,7 @@
             </p>
         </div>
 
-        <div class="flex items-center py-4 space-x-3">
+        <!-- <div class="flex items-center py-4 space-x-3">
             <div class="flex-shrink-0">
               <img
                 class="h-8 w-8 rounded-full"
@@ -401,7 +397,7 @@
                 <span> Follow </span>
               </button>
             </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </section>

@@ -6,6 +6,9 @@ app_name = "foro"
 
 urlpatterns = [
      # post
+     path("submit/post/",
+          views.PostSubmit.as_view(),
+          name="submit_post"),
      path("r/<str:subreddit>/post/create/",
           views.PostCreateView.as_view(),
           name="subreddit_post_create"),

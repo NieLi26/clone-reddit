@@ -1,5 +1,6 @@
 {% load static %}
-<div class="bg-gray-50 py-6">
+{% if request.user.is_authenticated %}
+  <div class="bg-gray-50 py-6">
       <div class="min-w-0 flex-1">
         <form id="formComment">
           <div>
@@ -20,8 +21,7 @@
         </form>
       </div>
   </div>
-
-
+  {% endif %}
 
 
 

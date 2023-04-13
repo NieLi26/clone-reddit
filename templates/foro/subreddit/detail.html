@@ -4,34 +4,36 @@
 {% block title %} {{ subreddit.name }} {% endblock title %}
 
 {% block content %}
-<div class="flex items-center px-6 py-4 md:max-w-3xl md:mx-auto lg:max-w-none lg:mx-0 xl:px-0 space-x-3">
-  <div class="flex-shrink-0">
-    <img
-      class="h-10 w-10 rounded-full"
-      {% if request.user.thumbnail %}
-        src="{{ request.user.thumbnail.url }}"
-      {% else %}
-        src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
-      {% endif %}
-      alt=""
-    />
-  </div>
+  {% if request.user.is_authenticated %}  
+    <div class="flex items-center px-6 py-4 md:max-w-3xl md:mx-auto lg:max-w-none lg:mx-0 xl:px-0 space-x-3">
+      <div class="flex-shrink-0">
+        <img
+          class="h-10 w-10 rounded-full"
+          {% if request.user.thumbnail %}
+            src="{{ request.user.thumbnail.url }}"
+          {% else %}
+            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+          {% endif %}
+          alt=""
+        />
+      </div>
 
-  <div class="w-full">
-    <label for="search" class="sr-only">Search</label>
-    <div class="relative">
-      <input id="search" name="search" class="block w-full bg-white border border-gray-300 rounded-md py-3.5 pl-5 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-rose-500 focus:border-rose-500 sm:text-sm" placeholder="Create Post" type="search">
+      <div class="w-full">
+        <label for="search" class="sr-only">Search</label>
+        <div class="relative">
+          <input id="search" name="search" class="block w-full bg-white border border-gray-300 rounded-md py-3.5 pl-5 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-rose-500 focus:border-rose-500 sm:text-sm" placeholder="Create Post" type="search">
+        </div>
+      </div>
+
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+      </svg>
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+      </svg>
     </div>
-  </div>
-
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-  </svg>
-  
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-  </svg>
-</div>
+  {% endif %}
   <div class="px-4 sm:px-0">
     <div class="sm:hidden">
       <label for="question-tabs" class="sr-only"
@@ -103,6 +105,7 @@
       data-click-redirect="{% url 'foro:subreddit_post_detail' subreddit.name post.publish.year post.publish.month post.publish.day post.slug %}"
       class="bg-white px-4 py-6 shadow sm:p-6 sm:rounded-lg border hover:border-gray-500 cursor-pointer post">
         <article aria-labelledby="question-title-81614">
+          <!-- Card title/image -->
           <div>
             <div class="flex space-x-3">
               <div class="flex-shrink-0">
@@ -272,13 +275,16 @@
             {{ post.title }}
             </h2>
           </div>
+          <!-- Card body -->
           <div class="mt-2 text-sm text-gray-700 space-y-4 max-h-[500px] overflow-y-hidden">
             <p class="">
               {{ post.body|safe }}
             </p>
           </div>
+          <!-- Card Footer -->
           <div class="mt-6 flex justify-between space-x-8">
             <div class="flex space-x-6">
+              {% if request.user.is_authenticated %}
               <span class="inline-flex items-center text-sm">
                 <button
                   type="button"
@@ -312,6 +318,8 @@
                   <span class="sr-only">likes</span>
                 </button>
               </span>
+              {% endif %}
+
               <span class="inline-flex items-center text-sm">
                 <button
                   type="button"
@@ -401,7 +409,7 @@
 
 {% block right_section %}
 
-    <section aria-labelledby="who-to-follow-heading">
+  <section aria-labelledby="who-to-follow-heading">
     <div class="bg-white rounded-lg shadow">
         <div class="flex items-center justify-between rounded-t-lg py-4 px-3 w-full bg-sky-700">
             <h2
@@ -545,12 +553,25 @@
         
       <div class="p-6">
         <p class="text-sm font-medium text-gray-900">
-            <!-- December 9 at 11:43 AM -->
-        {{ subreddit.description|safe }} 
-      </p>
 
-        
-        <div class="mt-6">
+        {{ subreddit.description|safe }} 
+        </p>
+        <p class="my-3 text-sm font-medium text-gray-500">
+          Created {{ subreddit.created| date:"M d, Y" }}
+        </p>
+        <div class="border border-gray-400"></div>
+        <div class="my-3 flex flex-col">
+          <div>
+            <span>
+              156K
+            </span>
+          </div>
+          <div class="text-xs text-gray-500">
+            Members
+          </div>
+        </div>
+        {% if request.user.is_authenticated %}  
+        <div class="mt-6 ">
           <a
             href="{% url 'foro:subreddit_post_create' subreddit.name %}"
             class="w-full block text-center px-4 py-2 border border-sky-300 shadow-sm text-sm font-bold rounded-md text-white bg-sky-700 hover:bg-sky-600"
@@ -558,15 +579,14 @@
             Create Post
           </a>
         </div>
-
-
+        {% endif %}
       </div>
     </div>
   </section>
 
-  <section aria-labelledby="who-to-follow-heading">
+  <!-- <section aria-labelledby="who-to-follow-heading">
     <div class="bg-white rounded-lg shadow">
-      <div class="p-6">
+      <div0 class="p-6">
         <h2
           id="who-to-follow-heading"
           class="text-base font-medium text-gray-900"
@@ -704,11 +724,11 @@
             View all
           </a>
         </div>
-      </div>
+      </div0
     </div>
   </section>
-  
-  <section aria-labelledby="trending-heading">
+   -->
+  <!-- <section aria-labelledby="trending-heading">
     <div class="bg-white rounded-lg shadow">
       <div class="p-6">
         <h2
@@ -856,7 +876,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
 {% endblock right_section %}
 
 
@@ -873,6 +893,7 @@
     dislike_exists ? buttonDislike.classList.replace("text-gray-400", "text-blue-500") : buttonDislike.classList.replace("text-blue-500", "text-gray-400")
  }
 
+ <!-- Like Action-->
  function sendLikeRequest(currentButton, buttonLike, buttonDislike){
     const url = '{% url "foro:post_like" %}';
     const options = {
@@ -898,6 +919,7 @@
     })
  }
 
+ <!-- POST LINKS -->
   document.querySelectorAll('li.post')
           .forEach((post)=>{
 
@@ -905,25 +927,28 @@
               const currentPost = this;
               location.href = currentPost.dataset.clickRedirect
             });
-            
+           
             const buttonLike = post.querySelector('.button-like')
             const buttonDislike = post.querySelector('.button-dislike')
 
-            buttonLike.addEventListener('click', function(){
-              event.stopPropagation();
-              let currentButton = this;
-              currentButton = currentButton.querySelector('.like')
+            if ( buttonLike && buttonDislike) {
 
-              sendLikeRequest(currentButton, buttonLike, buttonDislike)
-            });
+              buttonLike.addEventListener('click', function(){
+                event.stopPropagation();
+                let currentButton = this;
+                currentButton = currentButton.querySelector('.like')
 
-            buttonDislike.addEventListener('click', function(){
-              event.stopPropagation();
-              let currentButton = this;
-              currentButton = currentButton.querySelector('.dislike')
+                sendLikeRequest(currentButton, buttonLike, buttonDislike)
+              });
 
-              sendLikeRequest(currentButton, buttonLike, buttonDislike)
-            });
+              buttonDislike.addEventListener('click', function(){
+                event.stopPropagation();
+                let currentButton = this;
+                currentButton = currentButton.querySelector('.dislike')
+
+                sendLikeRequest(currentButton, buttonLike, buttonDislike)
+              });
+            }
 
           })
 
